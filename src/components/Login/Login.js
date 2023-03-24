@@ -1,24 +1,55 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import auth from '../../firebase.init';
 import './Login.css';
 
 const Login = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [
+        signInWithEmailAndPassword,
+        user,
+        loading,
+        error,
+    ] = useSignInWithEmailAndPassword(auth);
+    
+    const navigate = useNavigate();
+    const location=useLocation();
+const from=location.state?.from?.pathname || '/';
+    const handleEmailBlur = event => {
+        setEmail(event.target.value);
+    }
+    const handlePasswordlBlur = event => {
+        setPassword(event.target.value);
+        signInWithEmailAndPassword(email, password);
+    }
+    if (user) {
+        navigate(from,{replace:true});
+    }
+    const handleUSerSignIn = event => {
+        event.preventDefault();
+    }
     return (
         <div className='form-container'>
             <div className='input'>
-                <form action="">
-                    <h1 className='form-title'>Sign Up</h1>
+                <form onSubmit={handleUSerSignIn}>
+                    <h1 className='form-title'>Sign IN</h1>
                     <div className="input-group">
                         <label htmlFor="email">Email</label>
-                        <input type="email" name="" id="" />
+                        <input onBlur={handleEmailBlur} type="email" name="" id="" required />
                     </div>
                     <div className="input-group">
                         <label htmlFor="password">Password</label>
-                        <input type="password" name="" id="" />
+                        <input onBlur={handlePasswordlBlur} type="password" name="" id="" required />
                     </div>
+                    <p style={{ color: 'red' }}>{error?.message}</p>
+                    {
+                        loading && <p>Loading...</p>
+                    }
                     <input className='form-submit' type="submit" value="LogIn" />
                 </form>
-                <p>New To Ema-Jhon? <Link to='regsiter' className='form-link'>Create a new user</Link></p>
+                <p>New In Ema-John??? <Link className='form-link' to="/register">Please Register</Link> </p>
             </div>
         </div>
     );
